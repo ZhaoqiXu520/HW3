@@ -1,0 +1,79 @@
+---
+title: "HW2"
+output: html_document
+---
+install.packages("curl")
+
+```{r}
+library(foreign) #for reading spss (read.spss()), stata (read.dta()) and xpt (read.xport()) files
+library(haven) #for reading SPSS (read_sav()), stata (read_dta()), SAS(read_sas()) and xpt (read_xpt()) files
+library(readr) #for reading csv file (read_csv())
+
+```
+
+```{r}
+Class1SurveyFall2020 <-
+ read_csv(
+    "https://raw.githubusercontent.com/kijohnson/ADA-FAll-2020/master/Class%20One/Class%201%20Survey%20Fall%202020.csv"
+  
+  )
+```
+
+
+```{r results='asis', echo=TRUE}
+dim( Class1SurveyFall2020 )
+```
+```{r}
+#Make a list of columnnames
+varlist<-colnames(Class1SurveyFall2020)
+varlist
+
+#You do not have to specify [1:27] if you rename all columns
+names(Class1SurveyFall2020)[1:27]<-c( "id", "like_cats", "like_dogs", "desert island", "slogan", "favorite day", "lark", "food", "drink", "season", "month", "hobby", "degree", "specialization", "software", "r experience", "comfortable", "long", "threethings", "interest", "number", "bday", "bmonth", "home country", "home state", "home city", "education level") #renames variables in order of appearance
+#display the change in variable names
+colnames(Class1SurveyFall2020) 
+
+```
+
+
+
+```{r}
+#you can also count up number of different types of variables using sapply and table. In sapply we asks for the class of the variables in the starbucks dataset
+sapply(Class1SurveyFall2020, class)
+
+#then we ask to put this information in a table. 
+table(sapply(Class1SurveyFall2020, class))
+```
+
+
+```{r, echo=TRUE, warning=FALSE}
+Class1SurveyFall2020$bmonth_n<-as.numeric(Class1SurveyFall2020$`bmonth`)
+Class1SurveyFall2020$bday_n<-as.numeric(Class1SurveyFall2020$`bday`)
+
+median(Class1SurveyFall2020$bmonth_n, na.rm=TRUE) #get median
+median(Class1SurveyFall2020$bday_n, na.rm=TRUE) #get median
+```
+
+
+```{r}
+
+
+Class1SurveyFall2020$bseason[ Class1SurveyFall2020$bmonth_n <= 2& Class1SurveyFall2020$bmonth_n >= 12] <- 0
+Class1SurveyFall2020$bseason[ Class1SurveyFall2020$bmonth_n <= 5& Class1SurveyFall2020$bmonth_n >= 3] <- 1
+Class1SurveyFall2020$bseason[ Class1SurveyFall2020$bmonth_n <= 8& Class1SurveyFall2020$bmonth_n >= 6] <- 2
+Class1SurveyFall2020$bseason[ Class1SurveyFall2020$bmonth_n <= 11& Class1SurveyFall2020$bmonth_n >= 9] <- 3
+
+#change to factor variable and label levels
+Class1SurveyFall2020$bseason.f<-factor(Class1SurveyFall2020$bmonth_med, levels=c (0,1,2,3), labels = c("winter", "spring","summer","fall")) 
+
+#determine how many observations are in each level using table function
+table(Class1SurveyFall2020$bseason.f) 
+
+```
+
+```{r}
+#Suppose I want to know all answers from people who are native from US. How would I do that?
+native<-Class1SurveyFall2020[which(Class1SurveyFall2020$`home country`=='US' & Class1SurveyFall2020$`home country`=='United States'),]
+#summary stats
+summary (native)
+```
